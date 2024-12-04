@@ -42,7 +42,7 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--robot', type=str, default='tiago', help='Robot to use. Choose between tiago and fetch.')
-    parser.add_argument('--teleop_config', type=str, help='Path to the teleop config to use.')
+    parser.add_argument('--teleop_config', type=str,default="configs/vr_only.py" help='Path to the teleop config to use.')
     args = parser.parse_args()
 
     assert args.robot in COMPATIBLE_ROBOTS, f'Unknown robots. Choose one from: {" ".join(COMPATIBLE_ROBOTS)}' 

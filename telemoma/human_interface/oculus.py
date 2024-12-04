@@ -21,7 +21,7 @@ class OculusPolicy(BaseTeleopInterface):
         max_gripper_vel: float = 1,
         spatial_coeff: float = 1,
         pos_action_gain: float = 5,
-        rot_action_gain: float = 2,
+        rot_action_gain: float = 0.5,
         gripper_action_gain: float = 3,
         rmat_reorder: list = [-2, -1, -3, 4],
         *args,
@@ -189,6 +189,8 @@ class OculusPolicy(BaseTeleopInterface):
         quat_action = quat_diff(target_quat_offset, robot_quat_offset)
         euler_action = quat_to_euler(quat_action)
         
+        pos_action *= self.pos_action_gain
+        euler_action *= self.rot_action_gain
         delta_action = np.concatenate((pos_action, euler_action))
 
         if self.vr_state[arm]["gripper_toggle"]:

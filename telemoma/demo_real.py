@@ -1,10 +1,8 @@
-import rospy
-
 from telemoma.human_interface.teleop_policy import TeleopPolicy
 
 from importlib.machinery import SourceFileLoader
 
-COMPATIBLE_ROBOTS = ['tiago', 'hsr']
+COMPATIBLE_ROBOTS = ['tiago', 'hsr', 'franka']
 
 def main(args):
     teleop_config = SourceFileLoader('conf', args.teleop_config).load_module().teleop_config
@@ -30,6 +28,16 @@ def main(args):
                 torso_enabled=False,
                 arm_enabled=True,
             )
+
+    elif args.robot == 'franka':
+        from telemoma.robot_interface.franka.franka_gym import FrankaGym
+        env = FrankaGym(
+                frequency=10,
+                head_policy=None,
+                base_enabled=False,
+                torso_enabled=False,
+                arm_enabled=True,
+            )
     else:
         raise ValueError(f'Unknown robot: {args.robot}')
     obs = env.reset()
@@ -39,9 +47,8 @@ def main(args):
 
     def shutdown_helper():
         teleop.stop()
-    rospy.on_shutdown(shutdown_helper)
-
-    while not rospy.is_shutdown():
+    
+    while True:
         action = teleop.get_action(obs) # get_random_action()
         buttons = action.extra['buttons'] if 'buttons' in action.extra else {}
     
@@ -53,12 +60,11 @@ def main(args):
     shutdown_helper()
 
 if __name__ == "__main__":
-    rospy.init_node('telemoma_real')
 
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('--robot', type=str, default='tiago', help='Robot to use. Choose between tiago and hsr.')
-    parser.add_argument('--teleop_config', type=str, help='Path to the teleop config to use.')
+    parser.add_argument('--robot', type=str, default='franka', help='Robot to use. Choose between tiago and hsr.')
+    parser.add_argument('--teleop_config', type=str, default ="configs/only_spacemouse.py" ,help='Path to the teleop config to use.')
     args = parser.parse_args()
 
     assert args.robot in COMPATIBLE_ROBOTS, f'Unknown robots. Choose one from: {" ".join(COMPATIBLE_ROBOTS)}' 

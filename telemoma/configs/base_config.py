@@ -8,6 +8,7 @@ teleop_config = AttrDict(
     use_oculus=False,
     interface_kwargs=AttrDict(
         oculus={},
+        droid_vr={},
         vision={},
         mobile_phone={},
         spacemouse={},
